@@ -1,10 +1,6 @@
 module DemoMultipleSprockells where
 
-import BasicFunctions
-import HardwareTypes
 import Sprockell
-import System
-import Simulation
 
 prog :: [Instruction]
 prog = [
@@ -30,4 +26,3 @@ prog = [
        ]
 
 demoTest = sysTest [prog,prog,prog,prog]
-

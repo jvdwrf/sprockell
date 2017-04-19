@@ -1,12 +1,12 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module System where
+module Sprockell.System where
 
 import Data.Maybe
 
-import BasicFunctions
-import HardwareTypes
-import Sprockell
+import Sprockell.BasicFunctions
+import Sprockell.HardwareTypes
+import Sprockell.Sprockell
 
 
 -- ===================================================================================

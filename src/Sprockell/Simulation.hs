@@ -1,10 +1,10 @@
-module Simulation where
+module Sprockell.Simulation where
 
 import Control.DeepSeq
-import BasicFunctions
-import HardwareTypes
-import Sprockell
-import System
+import Sprockell.BasicFunctions
+import Sprockell.HardwareTypes
+import Sprockell.Sprockell
+import Sprockell.System
 
 -- ====================================================================================================
 -- Sprockell Test
@@ -81,4 +81,3 @@ sysTest instrss = putStr                                        -- putStr: stand
                 $ map (++"\n")
                 $ map myShow                                    -- make your own show-function?
                 $ systemSim instrss initSystemState clock
-

@@ -1,10 +1,10 @@
 {-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
-module HardwareTypes where
+module Sprockell.HardwareTypes where
 
 import GHC.Generics
 import Control.DeepSeq
 import Debug.Trace
-import BasicFunctions
+import Sprockell.BasicFunctions
 
 -- ==========================================================================================================
 -- Types and sizes for: data, memory, communication channels
@@ -175,4 +175,3 @@ data MachCode = MachCode                                        -- machine code:
         , loadReg       :: RegAddr                              -- register to load a value to
         , addrImm       :: MemAddr                              -- address for memory
         } deriving (Eq,Show)
-

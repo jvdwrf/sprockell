@@ -1,13 +1,13 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Sprockell where
+module Sprockell.Sprockell where
 
 import Data.Bits
 import Data.Maybe
 import Debug.Trace
 
-import BasicFunctions
-import HardwareTypes
+import Sprockell.BasicFunctions
+import Sprockell.HardwareTypes
 
 {-------------------------------------------------------------
 | SPROCKELL: Simple PROCessor in hasKELL :-)
