@@ -14,14 +14,19 @@ regE          = 6    :: Int
 intBool True  = 1                                               -- Bool-to-Int
 intBool False = 0
 
+(+>>) :: a -> [a] -> [a]
 x +>> xs = [x] ++ init xs                                       -- shift value into buffer
+(<<+) :: [a] -> a -> [a]
 xs <<+ x = tail xs ++ [x]
 
+($>) :: (a->b) -> [a] -> [b]
 f  $>  xs = map f xs
+
+(|$|) :: [a->b] -> [a] -> [b]
 fs |$| xs = zipWith (\f x -> f x) fs xs                         -- parallel application of a list of functions
                                                                 -- to an equally long list of arguments
 
-(!)  :: [a] -> Int -> a                                         -- list indexing
+(!) :: [a] -> Int -> a                                          -- list indexing
 xs ! i = xs !! i
 
 (<~) :: [a] -> (Int, a) -> [a]                                  -- put value x at address i in xs
@@ -33,6 +38,7 @@ xs <~! (i,x)    | i == 0        = xs
 
 x ∈ xs =  x `elem` xs
 
+concatWith :: a -> [[a]] -> [a]
 concatWith x [] = []                                            -- concats a list of lists with a "gluing element" x
 concatWith x [y] = y
 concatWith x (y:ys) = y ++ [x] ++ concatWith x ys
