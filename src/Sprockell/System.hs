@@ -2,8 +2,6 @@
 
 module Sprockell.System where
 
-import Data.Maybe
-
 import Sprockell.BasicFunctions
 import Sprockell.HardwareTypes
 import Sprockell.Sprockell

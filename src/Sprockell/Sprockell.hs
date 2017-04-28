@@ -3,8 +3,6 @@
 module Sprockell.Sprockell where
 
 import Data.Bits
-import Data.Maybe
-import Debug.Trace
 
 import Sprockell.BasicFunctions
 import Sprockell.HardwareTypes

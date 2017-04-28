@@ -3,8 +3,6 @@ module Sprockell.HardwareTypes where
 
 import GHC.Generics
 import Control.DeepSeq
-import Debug.Trace
-import Sprockell.BasicFunctions
 
 -- ==========================================================================================================
 -- Types and sizes for: data, memory, communication channels
