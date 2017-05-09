@@ -8,15 +8,12 @@ import Sprockell.Sprockell
 
 
 -- ===================================================================================
-shMem :: (SharedMem, RequestFifo)
-         -> IndRequests
-         -> ((SharedMem, RequestFifo), (SprID,Reply))
+shMem :: SharedMem
+         -> (SprID,Request)
+         -> (SharedMem, (SprID,Reply))
 
-shMem (sharedMem,requestFifo) chRequests = ((sharedMem',requestFifo'), (i,reply))
+shMem sharedMem (i,req) = (sharedMem', (i,reply))
         where
-          (i,req)  | not $ null requestFifo   = head requestFifo
-                   | otherwise                = (0, NoRequest)
-
           (reply, sharedMem')   = case req of
                 NoRequest                          -> ( Nothing            , sharedMem )
                 ReadReq a                          -> ( Just (sharedMem!a) , sharedMem )
@@ -24,7 +21,14 @@ shMem (sharedMem,requestFifo) chRequests = ((sharedMem',requestFifo'), (i,reply)
                 TestReq a     | sharedMem!a == 0   -> ( Just 1             , sharedMem <~ (a,1))
                               | otherwise          -> ( Just 0             , sharedMem )
 
-          requestFifo'  = drop 1 requestFifo ++ filter ((/=NoRequest).snd) chRequests
+updateFifo :: RequestFifo
+              -> IndRequests
+              -> (RequestFifo, (SprID,Request))
+updateFifo requestFifo chRequests = (requestFifo', req)
+        where
+          req  | not $ null requestFifo = head requestFifo
+               | otherwise              = (0, NoRequest)
+          requestFifo' = drop 1 requestFifo ++ filter ((/=NoRequest).snd) chRequests
 
 -- ===================================================================================
 transfer :: (RequestChannels, ReplyChannels)
@@ -56,8 +60,9 @@ system nrOfSprs instrss systemState _ = systemState'
           -- Communication
           ((requestChnls',replyChnls'), (chReplies,chRequests)) = transfer (requestChnls,replyChnls) (sprRequests,(i,shMemReply))
 
+          (requestFifo',request) = updateFifo requestFifo chRequests
           -- Shared Memory
-          ((sharedMem',requestFifo'), (i,shMemReply))           = shMem (sharedMem,requestFifo) chRequests
+          (sharedMem', (i,shMemReply))           = shMem sharedMem request
 
           systemState' = SystemState
                 { sprStates     = sprStates'
