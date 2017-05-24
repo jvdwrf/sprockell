@@ -31,11 +31,11 @@ updateFifo requestFifo chRequests = (requestFifo', req)
           requestFifo' = drop 1 requestFifo ++ filter ((/=NoRequest).snd) chRequests
 
 -- ===================================================================================
-transfer :: (RequestChannels, ReplyChannels)
-                -> (ParRequests, (SprID, Reply))
-                -> ((RequestChannels, ReplyChannels), (ParReplies, IndRequests))
+transferA :: (RequestChannels, ReplyChannels)
+                -> (ParRequests)
+                -> ((RequestChannels), (ParReplies, IndRequests))
 
-transfer (requestChnls,replyChnls) (sprRequests,(i,shMemReply)) = ( (requestChnls',replyChnls'), (outReplies,outRequests) )
+transferA (requestChnls,replyChnls) (sprRequests) = ( (requestChnls'), (outReplies,outRequests) )
         where
           -- ->->->->
           outRequests   = zip [0..] $ map head requestChnls                                             -- <<== TODO: abstract away from softare/hardware
@@ -43,8 +43,18 @@ transfer (requestChnls,replyChnls) (sprRequests,(i,shMemReply)) = ( (requestChnl
 
           -- <-<-<-<-
           n             = length replyChnls                                                             -- <<== TODO: abstraction difficult:
-          inReplies     = replicate n Nothing <~ (i,shMemReply)                                         --              no parameter n in CLaSH
+          --inReplies     = replicate n Nothing <~ (i,shMemReply)                                         --              no parameter n in CLaSH
           outReplies    = map head replyChnls
+          --replyChnls'   = zipWith (<<+) replyChnls inReplies
+
+transferB :: ReplyChannels
+                -> (SprID, Reply)
+                -> ReplyChannels
+transferB replyChnls (i,shMemReply) = replyChnls'
+        where
+          -- <-<-<-<-
+          n             = length replyChnls                                                             -- <<== TODO: abstraction difficult:
+          inReplies     = replicate n Nothing <~ (i,shMemReply)                                         --              no parameter n in CLaSH
           replyChnls'   = zipWith (<<+) replyChnls inReplies
 
 -- ===================================================================================
@@ -58,7 +68,8 @@ system nrOfSprs instrss systemState _ = systemState'
           (sprStates',sprRequests)                              = unzip $ sprockell $> instrss |$| sprStates |$| chReplies
 
           -- Communication
-          ((requestChnls',replyChnls'), (chReplies,chRequests)) = transfer (requestChnls,replyChnls) (sprRequests,(i,shMemReply))
+          ((requestChnls'), (chReplies,chRequests)) = transferA (requestChnls,replyChnls) (sprRequests)
+          replyChnls' = transferB replyChnls (i,shMemReply)
 
           (requestFifo',request) = updateFifo requestFifo chRequests
           -- Shared Memory
