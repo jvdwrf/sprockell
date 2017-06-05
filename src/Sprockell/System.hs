@@ -5,7 +5,9 @@ module Sprockell.System where
 import Sprockell.BasicFunctions
 import Sprockell.HardwareTypes
 import Sprockell.Sprockell
+import Data.Char   (ord,chr)
 import System.IO   (Handle,stdin,hGetChar,hReady)
+import Text.Printf (printf)
 
 numberIOaddr,charIOaddr :: MemAddr
 numberIOaddr = 0x10000
@@ -21,6 +23,44 @@ shMem :: SharedMem
          -> (SharedMem, (SprID,Reply))
 
 shMem sharedMem (i,req) = (sharedMem', (i,reply))
+        where
+          (reply, sharedMem')   = case req of
+                NoRequest                          -> ( Nothing            , sharedMem )
+                ReadReq a                          -> ( Just (sharedMem!a) , sharedMem )
+                WriteReq v a                       -> ( Nothing            , sharedMem <~ (a,v))
+                TestReq a     | sharedMem!a == 0   -> ( Just 1             , sharedMem <~ (a,1))
+                              | otherwise          -> ( Just 0             , sharedMem )
+
+shMemIO :: SharedMem
+         -> (SprID,Request)
+         -> IO (SharedMem, (SprID,Reply))
+
+shMemIO sharedMem (i,req)
+    | isNumberIOreq req = do
+        reply <- case req of
+                    NoRequest     -> return Nothing
+                    ReadReq a     -> do
+                        printf "Sprockell %i asks for a number: " i
+                        l <- getLine
+                        return (Just $ read l)
+                    WriteReq v a  -> do
+                        printf "Sprockell %i says %i\n" i v
+                        return Nothing
+                    TestReq a     -> error $ "TestAndSet on IO address: " ++ show req ++ " not supported"
+        return (sharedMem,(i,reply))
+    | isCharIOreq req = do
+        reply <- case req of
+                    NoRequest     -> return Nothing
+                    ReadReq a     -> do
+                        --mChar :: Maybe Char
+                        mChar <- hGetCharNonBlocking stdin
+                        return (Just $ maybe 0 ord mChar)
+                    WriteReq v a  -> do
+                        putChar $ chr v
+                        return Nothing
+                    TestReq a     -> error $ "TestAndSet on IO address: " ++ show req ++ " not supported"
+        return (sharedMem,(i,reply))
+    | otherwise   = return (sharedMem', (i,reply))
         where
           (reply, sharedMem')   = case req of
                 NoRequest                          -> ( Nothing            , sharedMem )
