@@ -7,6 +7,7 @@ import Sprockell.Sprockell
 import Sprockell.System
 
 import System.IO         (BufferMode(..),stdin,hGetBuffering,hSetBuffering)
+import Control.Exception (bracket)
 
 -- ====================================================================================================
 -- Sprockell Test
@@ -94,6 +95,13 @@ sysTest instrss = putStr                                        -- putStr: stand
                 $ map (++"\n")
                 $ map myShow                                    -- make your own show-function?
                 $ systemSim instrss initSystemState clock
+
+sysTestIO :: [[Instruction]] -> IO ()                             -- instrss: list of instructions per Sprockell
+sysTestIO instrss = do
+    bracket setupBuffering
+            restoreBuffering
+            (\_ -> systemSimIO instrss initSystemState clock)
+    return ()
 
 setupBuffering :: IO BufferMode
 setupBuffering = do
