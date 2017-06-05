@@ -4,7 +4,7 @@ module Sprockell
     , module Sprockell.Simulation
     ) where
 
-import Sprockell.HardwareTypes
+import Sprockell.HardwareTypes hiding (regX,regY) -- hide regX,Y to avoid confusion with regA-E
 import Sprockell.BasicFunctions
 import Sprockell.Sprockell
 import Sprockell.System
