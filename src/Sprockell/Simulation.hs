@@ -55,6 +55,17 @@ systemSim instrss s (t:ts) | not sysHalted = deepseq s $ (instrs,s') : systemSim
                   s'        = system nrOfSprockells instrss s t
                   sysHalted = and $ map (==EndProg) $ zipWith (!!) instrss $ map pc $ sprStates s
 
+systemSimIO :: [[Instruction]] -> SystemState -> Clock -> IO ()
+systemSimIO instrss s []     = return () -- []
+systemSimIO instrss s (t:ts) | sysHalted = return () --[]
+                             | otherwise = do
+                                     s' <- deepseq s $ systemIO nrOfSprockells instrss s t
+                                     systemSimIO instrss s' ts
+                where
+                  instrs    = zipWith (!) instrss (map pc $ sprStates s)
+                  sysHalted = (and $ map (==EndProg) $ zipWith (!!) instrss $ map pc $ sprStates s)
+                              && (and $ map and $ map (map (==NoRequest)) $ requestChnls s)
+                              && (and $ map (\(_,r) -> r == NoRequest) $ requestFifo s)
 nrOfSprockells  = 4 :: Int
 shMemSize       = 8 :: Int
 channelDelay    = 4 :: Int
