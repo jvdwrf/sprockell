@@ -6,6 +6,8 @@ import Sprockell.HardwareTypes
 import Sprockell.Sprockell
 import Sprockell.System
 
+import System.IO         (BufferMode(..),stdin,hGetBuffering,hSetBuffering)
+
 -- ====================================================================================================
 -- Sprockell Test
 -- ====================================================================================================
@@ -92,3 +94,13 @@ sysTest instrss = putStr                                        -- putStr: stand
                 $ map (++"\n")
                 $ map myShow                                    -- make your own show-function?
                 $ systemSim instrss initSystemState clock
+
+setupBuffering :: IO BufferMode
+setupBuffering = do
+    oldbuffering <- hGetBuffering stdin
+    hSetBuffering stdin  LineBuffering  -- needed to make line editing work for numberIO mode in ghci
+    --hSetBuffering stdout LineBuffering
+    return oldbuffering
+
+restoreBuffering :: BufferMode -> IO ()
+restoreBuffering = hSetBuffering stdin
