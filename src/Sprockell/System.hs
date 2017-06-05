@@ -154,3 +154,30 @@ system nrOfSprs instrss systemState _ = systemState'
                 , requestFifo   = requestFifo'
                 , sharedMem     = sharedMem'
                 }
+
+systemIO :: Int -> [InstructionMem] -> SystemState -> t -> IO SystemState
+
+systemIO nrOfSprs instrss systemState _ = do
+    let
+          SystemState{..} = systemState
+
+          -- Sprockells
+          (sprStates',sprRequests)                              = unzip $ sprockell $> instrss |$| sprStates |$| chReplies
+
+          -- Communication
+          ((requestChnls'), (chReplies,chRequests)) = transferA (requestChnls,replyChnls) (sprRequests)
+
+          (requestFifo',request) = updateFifo requestFifo chRequests
+          -- Shared Memory
+    (sharedMem', (i,shMemReply))           <- shMemIO sharedMem request
+    let
+          replyChnls' = transferB replyChnls (i,shMemReply)
+          systemState' = SystemState
+                { sprStates     = sprStates'
+                , requestChnls  = requestChnls'
+                , replyChnls    = replyChnls'
+                , requestFifo   = requestFifo'
+                , sharedMem     = sharedMem'
+                }
+
+    return systemState'
