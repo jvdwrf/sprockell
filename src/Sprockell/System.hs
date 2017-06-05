@@ -5,6 +5,7 @@ module Sprockell.System where
 import Sprockell.BasicFunctions
 import Sprockell.HardwareTypes
 import Sprockell.Sprockell
+import System.IO   (Handle,stdin,hGetChar,hReady)
 
 numberIOaddr,charIOaddr :: MemAddr
 numberIOaddr = 0x10000
@@ -27,6 +28,18 @@ shMem sharedMem (i,req) = (sharedMem', (i,reply))
                 WriteReq v a                       -> ( Nothing            , sharedMem <~ (a,v))
                 TestReq a     | sharedMem!a == 0   -> ( Just 1             , sharedMem <~ (a,1))
                               | otherwise          -> ( Just 0             , sharedMem )
+
+-- | Non-blocking variant of hGetChar
+--   When no input is available we return Nothing
+hGetCharNonBlocking :: Handle -> IO (Maybe Char)
+hGetCharNonBlocking h = do
+    ready <- hReady h
+    if ready then fmap Just $ hGetChar h
+             else return Nothing
+
+-- | Non-blocking variant of getChar
+getCharNonBlocking :: IO (Maybe Char)
+getCharNonBlocking = hGetCharNonBlocking stdin
 
 reqAddr :: Request -> Maybe MemAddr
 reqAddr req = case req of
