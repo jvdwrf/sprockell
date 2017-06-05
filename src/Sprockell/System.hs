@@ -6,6 +6,13 @@ import Sprockell.BasicFunctions
 import Sprockell.HardwareTypes
 import Sprockell.Sprockell
 
+numberIOaddr,charIOaddr :: MemAddr
+numberIOaddr = 0x10000
+charIOaddr   = 0x10001
+
+numberIO, charIO :: AddrImmDI
+numberIO = DirAddr numberIOaddr
+charIO   = DirAddr charIOaddr
 
 -- ===================================================================================
 shMem :: SharedMem
@@ -20,6 +27,18 @@ shMem sharedMem (i,req) = (sharedMem', (i,reply))
                 WriteReq v a                       -> ( Nothing            , sharedMem <~ (a,v))
                 TestReq a     | sharedMem!a == 0   -> ( Just 1             , sharedMem <~ (a,1))
                               | otherwise          -> ( Just 0             , sharedMem )
+
+reqAddr :: Request -> Maybe MemAddr
+reqAddr req = case req of
+    NoRequest    -> Nothing
+    ReadReq a    -> Just a
+    WriteReq _ a -> Just a
+    TestReq a    -> Just a
+
+isNumberIOreq, isCharIOreq :: Request -> Bool
+isNumberIOreq req = reqAddr req == Just numberIOaddr
+isCharIOreq   req = reqAddr req == Just charIOaddr
+
 
 updateFifo :: RequestFifo
               -> IndRequests
