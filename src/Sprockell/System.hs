@@ -20,22 +20,9 @@ charIO   = DirAddr charIOaddr
 -- ===================================================================================
 shMem :: SharedMem
          -> (SprID,Request)
-         -> (SharedMem, (SprID,Reply))
-
-shMem sharedMem (i,req) = (sharedMem', (i,reply))
-        where
-          (reply, sharedMem')   = case req of
-                NoRequest                          -> ( Nothing            , sharedMem )
-                ReadReq a                          -> ( Just (sharedMem!a) , sharedMem )
-                WriteReq v a                       -> ( Nothing            , sharedMem <~ (a,v))
-                TestReq a     | sharedMem!a == 0   -> ( Just 1             , sharedMem <~ (a,1))
-                              | otherwise          -> ( Just 0             , sharedMem )
-
-shMemIO :: SharedMem
-         -> (SprID,Request)
          -> IO (SharedMem, (SprID,Reply))
 
-shMemIO sharedMem (i,req)
+shMem sharedMem (i,req)
     | isNumberIOreq req = do
         reply <- case req of
                     NoRequest     -> return Nothing
@@ -130,34 +117,9 @@ transferB replyChnls (i,shMemReply) = replyChnls'
           replyChnls'   = zipWith (<<+) replyChnls inReplies
 
 -- ===================================================================================
-system :: [InstructionMem] -> SystemState -> t -> SystemState
+system :: [InstructionMem] -> SystemState -> t -> IO SystemState
 
-system instrss systemState _ = systemState'
-        where
-          SystemState{..} = systemState
-
-          -- Sprockells
-          (sprStates',sprRequests)                              = unzip $ sprockell $> instrss |$| sprStates |$| chReplies
-
-          -- Communication
-          ((requestChnls'), (chReplies,chRequests)) = transferA (requestChnls,replyChnls) (sprRequests)
-          replyChnls' = transferB replyChnls (i,shMemReply)
-
-          (requestFifo',request) = updateFifo requestFifo chRequests
-          -- Shared Memory
-          (sharedMem', (i,shMemReply))           = shMem sharedMem request
-
-          systemState' = SystemState
-                { sprStates     = sprStates'
-                , requestChnls  = requestChnls'
-                , replyChnls    = replyChnls'
-                , requestFifo   = requestFifo'
-                , sharedMem     = sharedMem'
-                }
-
-systemIO :: [InstructionMem] -> SystemState -> t -> IO SystemState
-
-systemIO instrss systemState _ = do
+system instrss systemState _ = do
     let
           SystemState{..} = systemState
 
@@ -169,7 +131,7 @@ systemIO instrss systemState _ = do
 
           (requestFifo',request) = updateFifo requestFifo chRequests
           -- Shared Memory
-    (sharedMem', (i,shMemReply))           <- shMemIO sharedMem request
+    (sharedMem', (i,shMemReply))           <- shMem sharedMem request
     let
           replyChnls' = transferB replyChnls (i,shMemReply)
           systemState' = SystemState

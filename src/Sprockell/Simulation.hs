@@ -50,27 +50,18 @@ data Tick  = Tick        deriving (Eq,Show)
 type Clock = [Tick]
 clock = repeat Tick
 
-systemSim :: [[Instruction]] -> SystemState -> Clock -> [([Instruction],SystemState)]
-systemSim instrss s []     = []
-systemSim instrss s (t:ts) | not sysHalted = deepseq s $ (instrs,s') : systemSim instrss s' ts
-                           | otherwise     = []
-                where
-                  instrs    = zipWith (!) instrss (map pc $ sprStates s)
-                  s'        = system instrss s t
-                  sysHalted = and $ map (==EndProg) $ zipWith (!!) instrss $ map pc $ sprStates s
-
-systemSimIO :: Debugger st -> [[Instruction]] -> SystemState -> Clock -> IO ()
-systemSimIO (dbg,dbgSt) instrss s []     = return ()
-systemSimIO (dbg,dbgSt) instrss s (t:ts) | sysHalted = return ()
-                                         | otherwise = do
-                                             s' <- deepseq s $ systemIO instrss s t
-                                             (dbgSt',s'') <- dbg dbgSt s'
-                                             systemSimIO (dbg,dbgSt') instrss s'' ts
-                where
-                  instrs    = zipWith (!) instrss (map pc $ sprStates s)
-                  sysHalted = (and $ map (==EndProg) $ zipWith (!!) instrss $ map pc $ sprStates s)
-                              && (and $ map and $ map (map (==NoRequest)) $ requestChnls s)
-                              && (and $ map (\(_,r) -> r == NoRequest) $ requestFifo s)
+systemSim :: Debugger st -> [[Instruction]] -> SystemState -> Clock -> IO ()
+systemSim (dbg,dbgSt) instrss s []     = return ()
+systemSim (dbg,dbgSt) instrss s (t:ts) | sysHalted = return ()
+                                       | otherwise = do
+                                           s' <- deepseq s $ system instrss s t
+                                           (dbgSt',s'') <- dbg dbgSt s'
+                                           systemSim (dbg,dbgSt') instrss s'' ts
+    where
+        instrs    = zipWith (!) instrss (map pc $ sprStates s)
+        sysHalted = (and $ map (==EndProg) $ zipWith (!!) instrss $ map pc $ sprStates s)
+                  && (and $ map and $ map (map (==NoRequest)) $ requestChnls s)
+                  && (and $ map (\(_,r) -> r == NoRequest) $ requestFifo s)
 
 
 shMemSize       = 8 :: Int
@@ -92,19 +83,11 @@ myShow (instrs,s) = show instrs ++ "\n" ++
                     show (sharedMem s)
 
 
-sysTest :: [[Instruction]] -> IO ()                             -- instrss: list of instructions per Sprockell
-sysTest instrss = putStr                                        -- putStr: standard Haskell IO-function
-                $ unlines
-                $ map (++"\n")
-                $ map myShow                                    -- make your own show-function?
-                $ systemSim instrss (initSystemState nrOfSprockells) clock
-    where nrOfSprockells = length instrss
-
-sysTestIO :: Debugger st -> [[Instruction]] -> IO ()                             -- instrss: list of instructions per Sprockell
-sysTestIO dbg instrss = do
+sysTest :: Debugger st -> [[Instruction]] -> IO ()                             -- instrss: list of instructions per Sprockell
+sysTest dbg instrss = do
     bracket setupBuffering
             restoreBuffering
-            (\_ -> systemSimIO dbg instrss (initSystemState nrOfSprockells) clock)
+            (\_ -> systemSim dbg instrss (initSystemState nrOfSprockells) clock)
     return ()
     where nrOfSprockells = length instrss
 
