@@ -100,11 +100,11 @@ sysTest instrss = putStr                                        -- putStr: stand
                 $ map myShow                                    -- make your own show-function?
                 $ systemSim instrss initSystemState clock
 
-sysTestIO :: [[Instruction]] -> IO ()                             -- instrss: list of instructions per Sprockell
-sysTestIO instrss = do
+sysTestIO :: Debugger st -> [[Instruction]] -> IO ()                             -- instrss: list of instructions per Sprockell
+sysTestIO dbg instrss = do
     bracket setupBuffering
             restoreBuffering
-            (\_ -> systemSimIO instrss initSystemState clock)
+            (\_ -> systemSimIO dbg instrss initSystemState clock)
     return ()
 
 setupBuffering :: IO BufferMode
