@@ -56,14 +56,14 @@ systemSim instrss s (t:ts) | not sysHalted = deepseq s $ (instrs,s') : systemSim
                            | otherwise     = []
                 where
                   instrs    = zipWith (!) instrss (map pc $ sprStates s)
-                  s'        = system nrOfSprockells instrss s t
+                  s'        = system instrss s t
                   sysHalted = and $ map (==EndProg) $ zipWith (!!) instrss $ map pc $ sprStates s
 
 systemSimIO :: Debugger st -> [[Instruction]] -> SystemState -> Clock -> IO ()
 systemSimIO (dbg,dbgSt) instrss s []     = return ()
 systemSimIO (dbg,dbgSt) instrss s (t:ts) | sysHalted = return ()
                                          | otherwise = do
-                                             s' <- deepseq s $ systemIO nrOfSprockells instrss s t
+                                             s' <- deepseq s $ systemIO instrss s t
                                              (dbgSt',s'') <- dbg dbgSt s'
                                              systemSimIO (dbg,dbgSt') instrss s'' ts
                 where
@@ -73,11 +73,10 @@ systemSimIO (dbg,dbgSt) instrss s (t:ts) | sysHalted = return ()
                               && (and $ map (\(_,r) -> r == NoRequest) $ requestFifo s)
 
 
-nrOfSprockells  = 4 :: Int
 shMemSize       = 8 :: Int
 channelDelay    = 4 :: Int
 
-initSystemState = SystemState
+initSystemState nrOfSprockells = SystemState
         { sprStates     = map initSprockellState [0 .. nrOfSprockells-1]
         , requestChnls  = replicate nrOfSprockells $ replicate channelDelay NoRequest
         , replyChnls    = replicate nrOfSprockells $ replicate channelDelay Nothing
@@ -98,14 +97,16 @@ sysTest instrss = putStr                                        -- putStr: stand
                 $ unlines
                 $ map (++"\n")
                 $ map myShow                                    -- make your own show-function?
-                $ systemSim instrss initSystemState clock
+                $ systemSim instrss (initSystemState nrOfSprockells) clock
+    where nrOfSprockells = length instrss
 
 sysTestIO :: Debugger st -> [[Instruction]] -> IO ()                             -- instrss: list of instructions per Sprockell
 sysTestIO dbg instrss = do
     bracket setupBuffering
             restoreBuffering
-            (\_ -> systemSimIO dbg instrss initSystemState clock)
+            (\_ -> systemSimIO dbg instrss (initSystemState nrOfSprockells) clock)
     return ()
+    where nrOfSprockells = length instrss
 
 setupBuffering :: IO BufferMode
 setupBuffering = do

@@ -130,9 +130,9 @@ transferB replyChnls (i,shMemReply) = replyChnls'
           replyChnls'   = zipWith (<<+) replyChnls inReplies
 
 -- ===================================================================================
-system :: Int -> [InstructionMem] -> SystemState -> t -> SystemState
+system :: [InstructionMem] -> SystemState -> t -> SystemState
 
-system nrOfSprs instrss systemState _ = systemState'
+system instrss systemState _ = systemState'
         where
           SystemState{..} = systemState
 
@@ -155,9 +155,9 @@ system nrOfSprs instrss systemState _ = systemState'
                 , sharedMem     = sharedMem'
                 }
 
-systemIO :: Int -> [InstructionMem] -> SystemState -> t -> IO SystemState
+systemIO :: [InstructionMem] -> SystemState -> t -> IO SystemState
 
-systemIO nrOfSprs instrss systemState _ = do
+systemIO instrss systemState _ = do
     let
           SystemState{..} = systemState
 
