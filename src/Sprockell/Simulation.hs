@@ -14,7 +14,7 @@ import Control.Exception (bracket)
 -- Sprockell Test
 -- ====================================================================================================
 
-sprockellSim :: [Instruction]
+sprockellSim :: InstructionMem
                 -> SprockellState
                 -> [Reply]
                 -> [(Instruction, SprockellState, Request)]
@@ -37,7 +37,7 @@ initSprockellState sprID = SprState
         , localMem = replicate localMemSize 0
         }
 
-sprTest :: Value -> [Instruction] -> [Reply] -> IO ()
+sprTest :: Value -> InstructionMem -> [Reply] -> IO ()
 sprTest sprID instrs input = putStr
                            $ unlines
                            $ map show
@@ -50,7 +50,7 @@ data Tick  = Tick        deriving (Eq,Show)
 type Clock = [Tick]
 clock = repeat Tick
 
-systemSim :: Debugger st -> [[Instruction]] -> SystemState -> Clock -> IO ()
+systemSim :: Debugger st -> [InstructionMem] -> SystemState -> Clock -> IO ()
 systemSim (dbg,dbgSt) instrss s []     = return ()
 systemSim (dbg,dbgSt) instrss s (t:ts) | sysHalted = return ()
                                        | otherwise = do
@@ -59,7 +59,7 @@ systemSim (dbg,dbgSt) instrss s (t:ts) | sysHalted = return ()
                                            systemSim (dbg,dbgSt') instrss s'' ts
     where
         instrs    = zipWith (!) instrss (map pc $ sprStates s)
-        sysHalted = (and $ map (==EndProg) $ zipWith (!!) instrss $ map pc $ sprStates s)
+        sysHalted = (and $ map (==EndProg) $ zipWith (!) instrss $ map pc $ sprStates s)
                   && (and $ map and $ map (map (==NoRequest)) $ requestChnls s)
                   && (and $ map (\(_,r) -> r == NoRequest) $ requestFifo s)
 

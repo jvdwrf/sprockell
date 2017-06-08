@@ -26,15 +26,22 @@ f  $>  xs = map f xs
 fs |$| xs = zipWith (\f x -> f x) fs xs                         -- parallel application of a list of functions
                                                                 -- to an equally long list of arguments
 
-(!) :: [a] -> Int -> a                                          -- list indexing
-xs ! i = xs !! i
+class Memory m where
+    fromList :: [a] -> m a
+    toList   :: m a -> [a]
+    (!)   :: m a -> Int -> a                                    -- indexing
+    (<~)  :: m a -> (Int,a) -> m a                              -- mem <~ (i,x): put value x at address i in mem
 
-(<~) :: [a] -> (Int, a) -> [a]                                  -- put value x at address i in xs
-xs <~ (i,x) = take i xs ++ [x] ++ drop (i+1) xs
-
-(<~!) :: [a] -> (Int, a) -> [a]                                 -- ibid, but leave address 0 unchanged
+(<~!) :: Memory m => m a -> (Int,a) -> m a                      -- ibid, but leave address 0 unchanged
 xs <~! (i,x)    | i == 0        = xs
                 | otherwise     = xs <~ (i,x)
+
+
+instance Memory [] where
+    fromList = id
+    toList   = id
+    xs ! i = xs !! i
+    xs <~ (i,x) = take i xs ++ [x] ++ drop (i+1) xs
 
 x ∈ xs =  x `elem` xs
 
