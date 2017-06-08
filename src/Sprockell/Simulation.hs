@@ -83,8 +83,11 @@ myShow (instrs,s) = show instrs ++ "\n" ++
                     show (sharedMem s)
 
 
-sysTest :: Debugger st -> [[Instruction]] -> IO ()                             -- instrss: list of instructions per Sprockell
-sysTest dbg instrss = do
+run :: [[Instruction]] -> IO ()                                                        -- instrss: list of instructions per Sprockell
+run = runWithDebugger noDebugger
+
+runWithDebugger :: Debugger st -> [[Instruction]] -> IO ()                             -- instrss: list of instructions per Sprockell
+runWithDebugger dbg instrss = do
     bracket setupBuffering
             restoreBuffering
             (\_ -> systemSim dbg instrss (initSystemState nrOfSprockells) clock)

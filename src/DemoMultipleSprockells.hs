@@ -1,5 +1,3 @@
-module DemoMultipleSprockells where
-
 import Sprockell
 
 prog :: [Instruction]
@@ -25,4 +23,4 @@ prog = [
          , EndProg
        ]
 
-demoTest = sysTest [prog,prog,prog,prog]
+main = run [prog,prog,prog]
