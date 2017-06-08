@@ -216,7 +216,7 @@ load ldCode (immval,aluOutput,memval,pc,reply) = case (ldCode, reply) of
 store :: LocalMem -> StCode -> (MemAddr, Value) -> LocalMem
 store mem stCode (address,value) = case stCode of
         StNone -> mem
-        StMem  -> mem <~! (address, value)
+        StMem  -> mem <~ (address, value)
 
 -- =====================================================================================
 -- nextPC: to calculate next program counter
