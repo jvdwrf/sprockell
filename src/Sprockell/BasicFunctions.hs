@@ -1,4 +1,8 @@
+{-# LANGUAGE FlexibleInstances #-}
 module Sprockell.BasicFunctions where
+import qualified Data.Array    as Array
+import qualified Data.Sequence as Sequence
+import qualified Data.Foldable as Foldable
 
 -- ==========================================================================================================
 -- Some elementary constants and Functions
@@ -42,6 +46,18 @@ instance Memory [] where
     toList   = id
     xs ! i = xs !! i
     xs <~ (i,x) = take i xs ++ [x] ++ drop (i+1) xs
+
+instance Memory (Array.Array Int) where
+    fromList xs = Array.listArray (0,length xs) xs
+    toList = Array.elems
+    (!) = (Array.!)
+    xs <~ (i,x) = xs Array.// [(i,x)]
+
+instance Memory Sequence.Seq where
+    fromList = Sequence.fromList
+    toList = Foldable.toList
+    (!)  = Sequence.index
+    xs <~ (i,x) = Sequence.update i x xs
 
 x ∈ xs =  x `elem` xs
 
