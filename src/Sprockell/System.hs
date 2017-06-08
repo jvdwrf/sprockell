@@ -6,8 +6,10 @@ import Sprockell.BasicFunctions
 import Sprockell.HardwareTypes
 import Sprockell.Sprockell
 import Data.Char   (ord,chr)
-import System.IO   (Handle,stdin,hGetChar,hReady)
+import System.IO   (Handle,stdin,hGetChar,hReady,BufferMode(..),hSetBuffering)
 import Text.Printf (printf)
+import Text.Read   (readMaybe)
+import Control.Exception (finally)
 
 numberIOaddr,charIOaddr :: MemAddr
 numberIOaddr = 0x10000
@@ -27,9 +29,8 @@ shMem sharedMem (i,req)
         reply <- case req of
                     NoRequest     -> return Nothing
                     ReadReq a     -> do
-                        printf "Sprockell %i asks for a number: " i
-                        l <- getLine
-                        return (Just $ read l)
+                        let prompt = printf "Sprockell %i asks for a number: " i
+                        fmap Just (promptForRead prompt)
                     WriteReq v a  -> do
                         printf "Sprockell %i says %i\n" i v
                         return Nothing
@@ -67,6 +68,24 @@ hGetCharNonBlocking h = do
 -- | Non-blocking variant of getChar
 getCharNonBlocking :: IO (Maybe Char)
 getCharNonBlocking = hGetCharNonBlocking stdin
+
+-- | Display a prompt, get a line of input and try to 'read' it.
+-- If the 'read' fails print an error and try again.
+promptForRead :: Read a => String -> IO a
+promptForRead prompt = do
+    setupBuffering
+    promptForRead'  `finally`  restoreBuffering
+    where
+        setupBuffering   = hSetBuffering stdin LineBuffering  -- needed to make line editing work
+        restoreBuffering = hSetBuffering stdin NoBuffering
+
+        promptForRead' = do
+            putStr prompt
+            l <- getLine
+            case readMaybe l of
+                Nothing -> do putStrLn "Invalid input"
+                              promptForRead'
+                Just x  -> return x
 
 reqAddr :: Request -> Maybe MemAddr
 reqAddr req = case req of

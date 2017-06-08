@@ -7,7 +7,7 @@ import Sprockell.Sprockell
 import Sprockell.System
 import Sprockell.Debugger
 
-import System.IO         (BufferMode(..),stdin,hGetBuffering,hSetBuffering)
+import System.IO         (BufferMode(..),stdin,stdout,hGetBuffering,hSetBuffering)
 import Control.Exception (bracket)
 
 -- ====================================================================================================
@@ -91,12 +91,15 @@ sysTest dbg instrss = do
     return ()
     where nrOfSprockells = length instrss
 
-setupBuffering :: IO BufferMode
+setupBuffering :: IO (BufferMode,BufferMode)
 setupBuffering = do
-    oldbuffering <- hGetBuffering stdin
-    hSetBuffering stdin  LineBuffering  -- needed to make line editing work for numberIO mode in ghci
-    --hSetBuffering stdout LineBuffering
-    return oldbuffering
+    oldin  <- hGetBuffering stdin
+    oldout <- hGetBuffering stdout
+    hSetBuffering stdin  NoBuffering  -- needed to make charIO work nicely
+    hSetBuffering stdout NoBuffering
+    return (oldin,oldout)
 
-restoreBuffering :: BufferMode -> IO ()
-restoreBuffering = hSetBuffering stdin
+restoreBuffering :: (BufferMode,BufferMode) -> IO ()
+restoreBuffering (modeIn,modeOut) = do
+    hSetBuffering stdin  modeIn
+    hSetBuffering stdout modeOut
