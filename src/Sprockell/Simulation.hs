@@ -34,7 +34,7 @@ initSprockellState sprID = SprState
         { pc       = 0
         , sp       = localMemSize
         , regbank  = replicate regbankSize 0 <~ (regSprID,sprID)
-        , localMem = replicate localMemSize 0
+        , localMem = fromList $ replicate localMemSize 0
         }
 
 sprTest :: Value -> InstructionMem -> [Reply] -> IO ()
@@ -72,7 +72,7 @@ initSystemState nrOfSprockells = SystemState
         , requestChnls  = replicate nrOfSprockells $ replicate channelDelay NoRequest
         , replyChnls    = replicate nrOfSprockells $ replicate channelDelay Nothing
         , requestFifo   = []
-        , sharedMem     = replicate shMemSize 0
+        , sharedMem     = fromList $ replicate shMemSize 0
         }
 
 myShow (instrs,s) = show instrs ++ "\n" ++

@@ -3,6 +3,7 @@ module Sprockell.HardwareTypes where
 
 import GHC.Generics
 import Control.DeepSeq
+import qualified Data.Sequence as Sequence
 
 -- ==========================================================================================================
 -- Types and sizes for: data, memory, communication channels
@@ -27,9 +28,9 @@ data AddrImmDI  = ImmValue Int                                  -- ImmValue n:is
                 | IndAddr RegAddr                               -- IndAddr p: p is a register, the content of this register is an address inmemory
                 deriving (Eq,Show,Read)
 
-type LocalMem   = [Value]
+type LocalMem   = Sequence.Seq Value
 type RegBank    = [Value]
-type SharedMem  = [Value]
+type SharedMem  = Sequence.Seq Value
 
 type InstructionMem = [Instruction]
 
@@ -67,7 +68,7 @@ data SystemState = SystemState
         , requestChnls  :: ![RequestChannel]                    -- list of all request channels
         , replyChnls    :: ![ReplyChannel]                      -- list of all reply channels
         , requestFifo   :: !RequestFifo                         -- request fifo for buffering requests
-        , sharedMem     :: ![Value]                             -- shared memory
+        , sharedMem     :: !SharedMem                           -- shared memory
         } deriving (Eq,Show,Generic,NFData)                     --      Exclamation mark for eager (non-lazy) evaluation
 
 -- ==========================================================================================================
