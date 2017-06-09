@@ -61,7 +61,7 @@ data SprockellState = SprState
         , sp            :: !MemAddr                             -- Stack pointer
         , regbank       :: !RegBank                             -- Register bank
         , localMem      :: !LocalMem                            -- Local memory
-        } deriving (Eq,Show,Generic,NFData)                     --      Exclamation mark for eager (non-lazy) evaluation
+        } deriving (Eq,Show)                                    --      Exclamation mark for eager (non-lazy) evaluation
 
 data SystemState = SystemState
         { sprStates     :: ![SprockellState]                    -- list of all Sprockell states
@@ -69,7 +69,24 @@ data SystemState = SystemState
         , replyChnls    :: ![ReplyChannel]                      -- list of all reply channels
         , requestFifo   :: !RequestFifo                         -- request fifo for buffering requests
         , sharedMem     :: !SharedMem                           -- shared memory
-        } deriving (Eq,Show,Generic,NFData)                     --      Exclamation mark for eager (non-lazy) evaluation
+        } deriving (Eq,Show)                                    --      Exclamation mark for eager (non-lazy) evaluation
+
+-- These instances are use by the deepseq in Simulation.systemSim to avoid space-leaks
+instance NFData SprockellState where
+    rnf (SprState pc sp regbank localMem)
+        = rnf pc
+          `seq` rnf sp
+          `seq` localMem  -- specificly only evaluate localMem to WHNF, Sequence should be strict already
+          `seq` rnf regbank
+
+instance NFData SystemState where
+    rnf (SystemState sprStates requestChnls replyChnls requestFifo sharedMem)
+        = rnf sprStates
+          `seq` rnf requestChnls
+          `seq` rnf replyChnls
+          `seq` rnf requestFifo
+          `seq` sharedMem  -- specificly only evaluate sharedMem to WHNF, Sequence should be strict already
+          `seq` ()
 
 -- ==========================================================================================================
 -- SprIL: Sprockell Instruction Language
