@@ -38,7 +38,7 @@ sprockell instrs sprState reply = (sprState', request)
 
         address      = agu aguCode (addrImm,x,sp)
 
-        loadValue    = load ldCode (immValue, aluOutput, localMem!address, pc, reply)
+        loadValue    = load ldCode (immValue, aluOutput, localMem!address, reply)
         regbank'     = regbank <~! (loadReg, loadValue)
 
         localMem'    = store localMem stCode (address,y)
@@ -198,12 +198,11 @@ agu aguCode (addrImm,x,sp) = case aguCode of
 -- =====================================================================================
 -- load: calculates the value that has to be put in a register
 -- =====================================================================================
-load :: LdCode -> (Value, Value, Value, Value, Reply) -> Value
-load ldCode (immval,aluOutput,memval,pc,reply) = case (ldCode, reply) of
+load :: LdCode -> (Value, Value, Value, Reply) -> Value
+load ldCode (immval,aluOutput,memval,reply) = case (ldCode, reply) of
         (LdImm, Nothing) -> immval
         (LdAlu, Nothing) -> aluOutput
         (LdMem, Nothing) -> memval
-        (LdPC , Nothing) -> pc
 
         (LdInp, Just rx) -> rx
         (LdInp, Nothing) -> 0

@@ -158,7 +158,6 @@ data AguCode    = AguDir                                        -- code to tell 
 data LdCode     = LdImm                                         -- code that indicates which value to load in register
                 | LdAlu
                 | LdMem
-                | LdPC
                 | LdInp
                 deriving (Eq,Show)
 
