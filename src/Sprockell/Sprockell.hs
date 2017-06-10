@@ -30,11 +30,13 @@ sprockell instrs sprState reply = (sprState', request)
         SprState{..} = sprState
         MachCode{..} = decode (instrs!pc)
 
-        (x,y)        = (regbank!regX , regbank!regY)
+        regbankExtended = regbank ++ [sp,pc] -- allow reading of sp and pc
+        (x,y)        = (regbankExtended ! regX , regbankExtended ! regY)
         aluOutput    = alu aluCode x y
 
         pc'          = nextPC branch tgtCode (x,reply) (pc,immValue,y)
-        sp'          = nextSP spCode sp
+        sp'          | loadReg == regSP = loadValue
+                     | otherwise        = nextSP spCode sp
 
         address      = agu aguCode (addrImm,x,sp)
 

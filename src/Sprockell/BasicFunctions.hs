@@ -15,6 +15,11 @@ regC          = 4    :: Int
 regD          = 5    :: Int
 regE          = 6    :: Int
 regF          = 7    :: Int
+regSP         = regbankSize
+regPC         = regbankSize + 1
+
+-- defines the number of registers excluding the stack pointer & program counter
+regbankSize   = 8    :: Int
 
 intBool True  = 1                                               -- Bool-to-Int
 intBool False = 0
