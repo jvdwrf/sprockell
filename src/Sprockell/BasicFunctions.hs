@@ -9,11 +9,12 @@ import qualified Data.Foldable as Foldable
 -- ==========================================================================================================
 reg0          = 0    :: Int                                 -- names for registers. reg0 is ALWAYS 0
 regSprID      = 1    :: Int                                 -- regSprID: contains the sprockellID
-regA          = 2    :: Int                                 -- registers A-E for other usage
+regA          = 2    :: Int                                 -- registers A-F for other usage
 regB          = 3    :: Int
 regC          = 4    :: Int
 regD          = 5    :: Int
 regE          = 6    :: Int
+regF          = 7    :: Int
 
 intBool True  = 1                                               -- Bool-to-Int
 intBool False = 0
