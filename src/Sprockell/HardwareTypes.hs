@@ -4,6 +4,7 @@ module Sprockell.HardwareTypes where
 import GHC.Generics
 import Control.DeepSeq
 import qualified Data.Sequence as Sequence
+import qualified Data.Array    as Array
 
 -- ==========================================================================================================
 -- Types and sizes for: data, memory, communication channels
@@ -32,7 +33,7 @@ type LocalMem   = Sequence.Seq Value
 type RegBank    = [Value]
 type SharedMem  = Sequence.Seq Value
 
-type InstructionMem = [Instruction]
+type InstructionMem = Array.Array Int Instruction
 
 type Reply      = Maybe Value                                   -- Every clock cycle an input arrives from shared memory, probably most of the time Nothing
 data Request    = NoRequest                                     -- No request to shared memory

@@ -90,9 +90,10 @@ runWithDebugger :: Debugger st -> [[Instruction]] -> IO ()                      
 runWithDebugger dbg instrss = do
     bracket setupBuffering
             restoreBuffering
-            (\_ -> systemSim dbg instrss (initSystemState nrOfSprockells) clock)
+            (\_ -> systemSim dbg instrss' (initSystemState nrOfSprockells) clock)
     return ()
     where nrOfSprockells = length instrss
+          instrss' = map fromList instrss  -- conversion to Memory
 
 setupBuffering :: IO (BufferMode,BufferMode)
 setupBuffering = do
