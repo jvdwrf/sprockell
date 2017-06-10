@@ -46,7 +46,9 @@ instance Memory [] where
     fromList = id
     toList   = id
     xs ! i = xs !! i
-    xs <~ (i,x) = take i xs ++ [x] ++ drop (i+1) xs
+    []     <~ _     = []                                        -- silently ignore update after end of list
+    (x:xs) <~ (0,y) = y:xs
+    (x:xs) <~ (n,y) = x : (xs <~ (n-1,y))
 
 instance Memory (Array.Array Int) where
     fromList xs = Array.listArray (0,length xs) xs
