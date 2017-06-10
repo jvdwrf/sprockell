@@ -166,12 +166,12 @@ data StCode     = StNone                                        -- code to tell 
                 | StMem
                 deriving (Eq,Show)
 
-data SPCode     = Down                                          -- code that tells how the stack pointer shoul dbe changed
+data SPCode     = Down                                          -- code that tells how the stack pointer should be changed
                 | Flat
                 | Up
                 deriving (Eq,Show)
 
-data IOCode     = IONone                                        -- code to instruct IO-fucntions
+data IOCode     = IONone                                        -- code to instruct IO-functions
                 | IORead
                 | IOWrite
                 | IOTest
