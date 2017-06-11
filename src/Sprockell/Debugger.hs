@@ -2,11 +2,17 @@ module Sprockell.Debugger where
 import Sprockell.HardwareTypes
 import Control.Monad (when, void)
 
+-- | A Debugger will get this as input each clock cycle:
+--   * a list of current 'Instruction's, one for each Sprockell core
+--   * the 'SystemState' after executing those instructions
+type DbgInput = ([Instruction], SystemState)
+
+
 -- | A DebuggerF represents a debugger for the Sprockell system
 --
--- It's a function from a debugger state and a 'SystemState'
+-- It's a function from a abstract debugger state and a 'DebuggerInput'
 -- to an IO action returning an potentially updated debugger state and SystemState.
-type DebuggerF st = st -> SystemState -> IO (st, SystemState)
+type DebuggerF st = st -> DbgInput -> IO (st, SystemState)
 
 -- |  A Debugger is a combination of a 'DebuggerF' and it's initial state.
 type Debugger  st = (DebuggerF st, st)
@@ -17,29 +23,29 @@ type Debugger  st = (DebuggerF st, st)
 noDebugger :: Debugger ()
 noDebugger = (noDebuggerF,())
     where
-        noDebuggerF st sys = return (st,sys)
+        noDebuggerF st (_,sys) = return (st,sys)
 
 -- | Given a show function for the SystemState,
 --   this creates a 'Debugger' that prints the 'SystemState'
 --   at each time step using the supplied show function.
-debuggerSimplePrint :: (SystemState -> String) -> Debugger ()
+debuggerSimplePrint :: (DbgInput -> String) -> Debugger ()
 debuggerSimplePrint showF = debuggerPrintCondWaitCond showF (const True) (const False)
 
 -- | Like 'debuggerSimplePrint',
 --   but pauses execution after each time step
 --   and waits for you to hit enter to continue.
 --   It let you step through the execution slowly.
-debuggerSimplePrintAndWait :: (SystemState -> String) -> Debugger ()
+debuggerSimplePrintAndWait :: (DbgInput -> String) -> Debugger ()
 debuggerSimplePrintAndWait showF = debuggerPrintCondWaitCond showF (const True) (const True)
 
 
-debuggerPrintCondWaitCond :: (SystemState -> String) -- ^ show function used to show (parts of) the state
-                          -> (SystemState -> Bool)   -- ^ when this condition is True the state is printed
-                          -> (SystemState -> Bool)   -- ^ when this condition is True execution pauses
+debuggerPrintCondWaitCond :: (DbgInput -> String) -- ^ show function used to show (parts of) the state
+                          -> (DbgInput -> Bool)   -- ^ when this condition is True the state is printed
+                          -> (DbgInput -> Bool)   -- ^ when this condition is True execution pauses
                           -> Debugger ()
 debuggerPrintCondWaitCond showF showCond waitCond = (dbg, ())
     where
-        dbg dbgSt sysSt = do
-            when (showCond sysSt) (putStrLn $ showF sysSt)
-            when (waitCond sysSt) (void getLine) -- wait for enter key
+        dbg dbgSt now@(instrs,sysSt) = do
+            when (showCond now) (putStrLn $ showF now)
+            when (waitCond now) (void getLine) -- wait for enter key
             return (dbgSt,sysSt)

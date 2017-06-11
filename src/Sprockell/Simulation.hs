@@ -53,8 +53,9 @@ systemSim :: Debugger st -> [InstructionMem] -> SystemState -> Clock -> IO ()
 systemSim (dbg,dbgSt) instrss s []     = return ()
 systemSim (dbg,dbgSt) instrss s (t:ts) | sysHalted = return ()
                                        | otherwise = do
+                                           let curInstrs = zipWith (!) instrss (map pc $ sprStates s)
                                            s' <- deepseq s $ system instrss s t
-                                           (dbgSt',s'') <- dbg dbgSt s'
+                                           (dbgSt',s'') <- dbg dbgSt (curInstrs,s')
                                            systemSim (dbg,dbgSt') instrss s'' ts
     where
         instrs    = zipWith (!) instrss (map pc $ sprStates s)
