@@ -1,6 +1,7 @@
 module Sprockell.Debugger where
 import Sprockell.HardwareTypes
 import Control.Monad (when, void)
+import System.IO (Handle,hPutStrLn,hGetLine)
 import Text.Printf
 
 -- | A Debugger will get this as input each clock cycle:
@@ -15,14 +16,21 @@ type DbgInput = ([Instruction], SystemState)
 -- to an IO action returning an potentially updated debugger state and SystemState.
 type DebuggerF st = st -> DbgInput -> IO (st, SystemState)
 
--- |  A Debugger is a combination of a 'DebuggerF' and its initial state.
-type Debugger  st = (DebuggerF st, st)
 
+-- |  A Debugger is a thing that you can pass to runWithDebugger of runWithDebuggerOverNetwork
+--
+-- Internally its a function that gets two Handles:
+--    * the first  Handle is where the Debugger reads its input from
+--    * the second Handle is where the Debugger writes it output to
+-- , and produces a DebuggerPair connected to those handles.
+type Debugger st = (Handle,Handle) -> DebuggerPair st
 
+-- |  A DebuggerPair is a combination of a 'DebuggerF' and its initial state.
+type DebuggerPair st = (DebuggerF st, st)
 
 -- | No debugging at all, just run the system.
 noDebugger :: Debugger ()
-noDebugger = (noDebuggerF,())
+noDebugger _ = (noDebuggerF,())
     where
         noDebuggerF st (_,sys) = return (st,sys)
 
@@ -44,11 +52,11 @@ debuggerPrintCondWaitCond :: (DbgInput -> String) -- ^ show function used to sho
                           -> (DbgInput -> Bool)   -- ^ when this condition is True the state is printed
                           -> (DbgInput -> Bool)   -- ^ when this condition is True execution pauses
                           -> Debugger ()
-debuggerPrintCondWaitCond showF showCond waitCond = (dbg, ())
+debuggerPrintCondWaitCond showF showCond waitCond (inp,out) = (dbg, ())
     where
         dbg dbgSt now@(instrs,sysSt) = do
-            when (showCond now) (putStrLn $ showF now)
-            when (waitCond now) (void getLine) -- wait for enter key
+            when (showCond now) (hPutStrLn out $ showF now)
+            when (waitCond now) (void $ hGetLine inp) -- wait for enter key
             return (dbgSt,sysSt)
 
 

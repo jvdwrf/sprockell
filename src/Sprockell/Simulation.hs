@@ -44,7 +44,7 @@ sprTest sprID instrs input = putStr
 -- System Test
 -- ====================================================================================================
 
-systemSim :: Debugger st -> [InstructionMem] -> SystemState -> Clock -> IO ()
+systemSim :: DebuggerPair st -> [InstructionMem] -> SystemState -> Clock -> IO ()
 systemSim (dbg,dbgSt) instrss s []     = return ()
 systemSim (dbg,dbgSt) instrss s (t:ts) | sysHalted = return ()
                                        | otherwise = do
@@ -74,10 +74,11 @@ runWithDebugger :: Debugger st -> [[Instruction]] -> IO ()       -- debugger + l
 runWithDebugger dbg instrss = do
     bracket setupBuffering
             restoreBuffering
-            (\_ -> systemSim dbg instrss' (initSystemState nrOfSprockells) clock)
+            (\_ -> systemSim dbgPair instrss' (initSystemState nrOfSprockells) clock)
     return ()
     where nrOfSprockells = length instrss
           instrss' = map fromList instrss  -- conversion to Memory
+          dbgPair = dbg (stdin,stdout)
 
 setupBuffering :: IO (BufferMode,BufferMode)
 setupBuffering = do
