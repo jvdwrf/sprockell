@@ -68,10 +68,6 @@ myShow' (instrs,s) = show instrs ++ "\n"
                      ++ (unlines $ map show $ sprStates s)
 
 
-testMyShow = myShow ( [Nop, EndProg]
-                    , initSystemState 2
-                    )
-
 -- ======================================================================
 -- examples of conditions that can be used with debuggerPrintCondWaitCond
 -- ======================================================================
