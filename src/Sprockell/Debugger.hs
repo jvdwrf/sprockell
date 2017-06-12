@@ -15,7 +15,7 @@ type DbgInput = ([Instruction], SystemState)
 -- to an IO action returning an potentially updated debugger state and SystemState.
 type DebuggerF st = st -> DbgInput -> IO (st, SystemState)
 
--- |  A Debugger is a combination of a 'DebuggerF' and it's initial state.
+-- |  A Debugger is a combination of a 'DebuggerF' and its initial state.
 type Debugger  st = (DebuggerF st, st)
 
 
@@ -52,7 +52,9 @@ debuggerPrintCondWaitCond showF showCond waitCond = (dbg, ())
             return (dbgSt,sysSt)
 
 
+-- ======================================================================
 -- examples of show functions that you could with the above debuggers
+-- ======================================================================
 myShow :: DbgInput -> String
 myShow (instrs,s) = printf "instrs: %s\nsprStates:\n%s\nrequests: %s\nreplies: %s\nrequestFifo: %s\nsharedMem: %s\n"
                     (show instrs)
@@ -66,9 +68,9 @@ myShow' (instrs,s) = show instrs ++ "\n"
                      ++ (unlines $ map show $ sprStates s)
 
 
-
+-- ======================================================================
 -- examples of conditions that can be used with debuggerPrintCondWaitCond
-
+-- ======================================================================
 always,never :: DbgInput -> Bool
 always = const True
 never  = const False
@@ -80,7 +82,7 @@ whenJumping (instrs,st) = any isJump instrs
         isJump (Jump _) = True
         isJump _        = False
 
--- | Checks whether any of the program counter are in a given range
+-- | Checks whether any of the program counters are in a given range
 pcInRange :: CodeAddr -> CodeAddr -> (DbgInput -> Bool)
 pcInRange min max (_,sysSt) = any inRange $ map pc $ sprStates sysSt
     where

@@ -72,7 +72,9 @@ data SystemState = SystemState
         , sharedMem     :: !SharedMem                           -- shared memory
         } deriving (Eq,Show)                                    --      Exclamation mark for eager (non-lazy) evaluation
 
--- These instances are use by the deepseq in Simulation.systemSim to avoid space-leaks
+-- ==========================================================================================================
+-- These instances are used by the deepseq in Simulation.systemSim to avoid space-leaks
+-- ==========================================================================================================
 instance NFData SprockellState where
     rnf (SprState pc sp regbank localMem)
         = rnf pc

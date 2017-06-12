@@ -75,10 +75,10 @@ initSystemState nrOfSprockells = SystemState
         , sharedMem     = fromList $ replicate shMemSize 0
         }
 
-run :: [[Instruction]] -> IO ()                                                        -- instrss: list of instructions per Sprockell
+run :: [[Instruction]] -> IO ()                                  -- list of programs per Sprockell
 run = runWithDebugger noDebugger
 
-runWithDebugger :: Debugger st -> [[Instruction]] -> IO ()                             -- instrss: list of instructions per Sprockell
+runWithDebugger :: Debugger st -> [[Instruction]] -> IO ()       -- debugger + list of programs per Sprockell
 runWithDebugger dbg instrss = do
     bracket setupBuffering
             restoreBuffering
