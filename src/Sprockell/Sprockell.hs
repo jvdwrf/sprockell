@@ -117,7 +117,7 @@ decode instr = case instr of
                                    DirAddr a   -> nullcode {ioCode=IOWrite, regY=fromReg, ldCode=LdMem, aguCode=AguDir, addrImm=a}
                                    IndAddr p   -> nullcode {ioCode=IOWrite, regY=fromReg, ldCode=LdMem, aguCode=AguInd, regX=p}
 
-  TestAndSet memAddr         -> case memAddr of
+  TestAndSet memAddr          -> case memAddr of
                                    ImmValue n  -> nullcode -- undefined
                                    DirAddr a   -> nullcode {ioCode=IOTest, ldCode=LdMem, aguCode=AguDir, addrImm=a}
                                    IndAddr p   -> nullcode {ioCode=IOTest, ldCode=LdMem, aguCode=AguInd, regX=p}

@@ -116,6 +116,7 @@ data Instruction = Compute Operator RegAddr RegAddr RegAddr     -- Compute op r0
 
                  | Push RegAddr                                 -- Push r: put the value from register r on the stack
                  | Pop RegAddr                                  -- Pop r : put the top of the stack in register r
+                                                                --         and adapts the stack pointer
 
                  | ReadInstr AddrImmDI                          -- ReadInstr a: Send read request for shMem address a
                  | Receive RegAddr                              -- Receive r  : Wait for reply and save it in register r
