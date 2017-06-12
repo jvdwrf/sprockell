@@ -30,14 +30,14 @@ noDebugger = (noDebuggerF,())
 --   this creates a 'Debugger' that prints the 'SystemState'
 --   at each time step using the supplied show function.
 debuggerSimplePrint :: (DbgInput -> String) -> Debugger ()
-debuggerSimplePrint showF = debuggerPrintCondWaitCond showF (const True) (const False)
+debuggerSimplePrint showF = debuggerPrintCondWaitCond showF always never
 
 -- | Like 'debuggerSimplePrint',
 --   but pauses execution after each time step
 --   and waits for you to hit enter to continue.
 --   It let you step through the execution slowly.
 debuggerSimplePrintAndWait :: (DbgInput -> String) -> Debugger ()
-debuggerSimplePrintAndWait showF = debuggerPrintCondWaitCond showF (const True) (const True)
+debuggerSimplePrintAndWait showF = debuggerPrintCondWaitCond showF always always
 
 
 debuggerPrintCondWaitCond :: (DbgInput -> String) -- ^ show function used to show (parts of) the state
@@ -64,3 +64,24 @@ myShow (instrs,s) = printf "instrs: %s\nsprStates:\n%s\nrequests: %s\nreplies: %
 
 myShow' (instrs,s) = show instrs ++ "\n"
                      ++ (unlines $ map show $ sprStates s)
+
+
+
+-- examples of conditions that can be used with debuggerPrintCondWaitCond
+
+always,never :: DbgInput -> Bool
+always = const True
+never  = const False
+
+-- | Checks whether any core in executing a Jump instruction
+whenJumping :: DbgInput -> Bool
+whenJumping (instrs,st) = any isJump instrs
+    where
+        isJump (Jump _) = True
+        isJump _        = False
+
+-- | Checks whether any of the program counter are in a given range
+pcInRange :: CodeAddr -> CodeAddr -> (DbgInput -> Bool)
+pcInRange min max (_,sysSt) = any inRange $ map pc $ sprStates sysSt
+    where
+        inRange x = min <= x && x <= max
