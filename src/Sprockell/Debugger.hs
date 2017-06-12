@@ -1,6 +1,7 @@
 module Sprockell.Debugger where
 import Sprockell.HardwareTypes
 import Control.Monad (when, void)
+import Text.Printf
 
 -- | A Debugger will get this as input each clock cycle:
 --   * a list of current 'Instruction's, one for each Sprockell core
@@ -49,3 +50,17 @@ debuggerPrintCondWaitCond showF showCond waitCond = (dbg, ())
             when (showCond now) (putStrLn $ showF now)
             when (waitCond now) (void getLine) -- wait for enter key
             return (dbgSt,sysSt)
+
+
+-- examples of show functions that you could with the above debuggers
+myShow :: DbgInput -> String
+myShow (instrs,s) = printf "instrs: %s\nsprStates:\n%s\nrequests: %s\nreplies: %s\nrequestFifo: %s\nsharedMem: %s\n"
+                    (show instrs)
+                    (unlines $ map show $ sprStates s)
+                    (show $ requestChnls s)
+                    (show $ replyChnls s)
+                    (show $ requestFifo s)
+                    (show $ sharedMem s)
+
+myShow' (instrs,s) = show instrs ++ "\n"
+                     ++ (unlines $ map show $ sprStates s)
