@@ -15,7 +15,7 @@ type DbgInput = ([Instruction], SystemState)
 -- to an IO action returning an potentially updated debugger state and SystemState.
 type DebuggerF st = st -> DbgInput -> IO (st, SystemState)
 
--- |  A Debugger is a combination of a 'DebuggerF' and it's initial state.
+-- |  A Debugger is a combination of a 'DebuggerF' and its initial state.
 type Debugger  st = (DebuggerF st, st)
 
 

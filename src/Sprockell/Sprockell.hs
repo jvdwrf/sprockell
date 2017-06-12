@@ -31,6 +31,7 @@ sprockell instrs sprState reply = (sprState', request)
         MachCode{..} = decode (instrs!pc)
 
         regbankExtended = regbank ++ [sp,pc] -- allow reading of sp and pc
+
         (x,y)        = (regbankExtended ! regX , regbankExtended ! regY)
         aluOutput    = alu aluCode x y
 
