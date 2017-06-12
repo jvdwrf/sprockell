@@ -2,25 +2,26 @@ import Sprockell
 
 prog :: [Instruction]
 prog = [
-           Branch regSprID (Rel 6)
-         , Load (ImmValue 12) regC
+           Branch regSprID (Rel 6)     -- target "beginLoop"
+         , Load (ImmValue 13) regC
          , WriteInstr regC (DirAddr 1) -- Sprockell 1 must jump to second EndProg
          , WriteInstr regC (DirAddr 2) -- Sprockell 2 must jump to second EndProg
          , WriteInstr regC (DirAddr 3) -- Sprockell 3 must jump to second EndProg
-         , Jump (Abs 11)               -- Sprockell 0 jumps to first EndProg
-         -- BEGIN: loop
+         , Jump (Abs 12)               -- Sprockell 0 jumps to first EndProg
+         -- beginLoop
          , ReadInstr (IndAddr regSprID)
          , Receive regA
          , Compute Equal regA reg0 regB
          , Branch regB (Rel (-3))
-         -- END: loop
+         -- endLoop
+         , WriteInstr regA numberIO
          , Jump (Ind regA)
 
-         -- 11: Sprockell 0 is sent here
+         -- 12: Sprockell 0 is sent here
          , EndProg
 
-         -- 12: Sprockells 1, 2 and 3 are sent here
+         -- 13: Sprockells 1, 2 and 3 are sent here
          , EndProg
        ]
 
-main = run [prog,prog,prog]
+main = runWithDebugger (debuggerSimplePrintAndWait myShow) [prog,prog,prog,prog]
