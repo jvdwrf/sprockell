@@ -37,6 +37,7 @@ sprockell instrs sprState reply = (sprState', request)
         aluOutput    = alu aluCode x y
 
         pc'          = nextPC branch tgtCode (x,reply) (pc,immValue,y)
+
         sp'          | loadReg == regSP = loadValue
                      | otherwise        = nextSP spCode sp
 

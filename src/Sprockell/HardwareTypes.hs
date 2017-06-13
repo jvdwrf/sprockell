@@ -1,10 +1,11 @@
-{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
+{-# LANGUAGE FlexibleInstances, DeriveGeneric, DeriveAnyClass #-}
 module Sprockell.HardwareTypes where
 
 import GHC.Generics
 import Control.DeepSeq
 import qualified Data.Sequence as Sequence
 import qualified Data.Array    as Array
+import qualified Data.Foldable as Foldable
 
 -- ==========================================================================================================
 -- Types and sizes for: data, memory, communication channels
@@ -54,6 +55,44 @@ type ParRequests        = [Request]                             -- all requests 
 type ParReplies         = [Reply]                               -- ibid for replies
 type RequestFifo        = [(SprID,Request)]                     -- Collects all Sprockell requests as input for Shared Memory
 
+
+-- ==========================================================================================================
+-- Memory type class + instances
+-- ==========================================================================================================
+
+class Memory m where
+    fromList :: [a] -> m a
+    toList   :: m a -> [a]
+    (!)      :: m a -> Int -> a                      -- indexing
+    (<~)     :: m a -> (Int,a) -> m a                -- mem <~ (i,x): put value x at address i in mem
+
+    (<~!)    :: m a -> (Int,a) -> m a                -- ibid, but leave address 0 unchanged
+    xs <~! (i,x)    | i == 0        = xs
+                    | otherwise     = xs <~ (i,x)
+
+
+instance Memory [] where
+    fromList        = id
+    toList          = id
+    xs ! i          = xs !! i
+    []     <~ _     = []                             -- silently ignore update after end of list
+    (x:xs) <~ (0,y) = y:xs
+    (x:xs) <~ (n,y) = x : (xs <~ (n-1,y))
+
+instance Memory (Array.Array Int) where
+    fromList xs = Array.listArray (0,length xs) xs
+    toList      = Array.elems
+    (!)         = (Array.!)
+    xs <~ (i,x) = xs Array.// [(i,x)]
+
+instance Memory Sequence.Seq where
+    fromList    = Sequence.fromList
+    toList      = Foldable.toList
+    (!)         = Sequence.index
+    xs <~ (i,x) = Sequence.update i x xs
+
+
+
 -- ==========================================================================================================
 -- Internal state for Sprockell and System
 -- ==========================================================================================================
@@ -71,25 +110,6 @@ data SystemState = SystemState
         , requestFifo   :: !RequestFifo                         -- request fifo for buffering requests
         , sharedMem     :: !SharedMem                           -- shared memory
         } deriving (Eq,Show)                                    --      Exclamation mark for eager (non-lazy) evaluation
-
--- ==========================================================================================================
--- These instances are used by the deepseq in Simulation.systemSim to avoid space-leaks
--- ==========================================================================================================
-instance NFData SprockellState where
-    rnf (SprState pc sp regbank localMem)
-        = rnf pc
-          `seq` rnf sp
-          `seq` localMem  -- specificly only evaluate localMem to WHNF, Sequence should be strict already
-          `seq` rnf regbank
-
-instance NFData SystemState where
-    rnf (SystemState sprStates requestChnls replyChnls requestFifo sharedMem)
-        = rnf sprStates
-          `seq` rnf requestChnls
-          `seq` rnf replyChnls
-          `seq` rnf requestFifo
-          `seq` sharedMem  -- specificly only evaluate sharedMem to WHNF, Sequence should be strict already
-          `seq` ()
 
 -- ==========================================================================================================
 -- SprIL: Sprockell Instruction Language
@@ -194,3 +214,33 @@ data MachCode = MachCode                                        -- machine code:
         , loadReg       :: RegAddr                              -- register to load a value to
         , addrImm       :: MemAddr                              -- address for memory
         } deriving (Eq,Show)
+
+
+
+
+-- ==========================================================================================================
+-- Clock for simulation
+-- ==========================================================================================================
+data Tick  = Tick        deriving (Eq,Show)
+type Clock = [Tick]
+clock = repeat Tick
+
+
+-- ==========================================================================================================
+-- These instances are used by the deepseq in Simulation.systemSim to avoid space-leaks
+-- ==========================================================================================================
+instance NFData SprockellState where
+    rnf (SprState pc sp regbank localMem)
+        = rnf pc
+          `seq` rnf sp
+          `seq` localMem  -- specificly only evaluate localMem to WHNF, Sequence should be strict already
+          `seq` rnf regbank
+
+instance NFData SystemState where
+    rnf (SystemState sprStates requestChnls replyChnls requestFifo sharedMem)
+        = rnf sprStates
+          `seq` rnf requestChnls
+          `seq` rnf replyChnls
+          `seq` rnf requestFifo
+          `seq` sharedMem  -- specificly only evaluate sharedMem to WHNF, Sequence should be strict already
+          `seq` ()
