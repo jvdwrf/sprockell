@@ -2,7 +2,6 @@ import Sprockell
 
 main = run [prog]
 
--- source file was: resources/testPrograms/mandelbrot4.tgs
 prog =
   [ Load (ImmValue 1) 6
   , WriteInstr 6 (IndAddr 0)

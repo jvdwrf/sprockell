@@ -26,8 +26,6 @@ sprockellSim instrs s (i:is) | instr /= EndProg    = (instr,s',o) : sprockellSim
                   (s',o) = sprockell instrs s i
                   instr  = instrs ! pc s
 
-localMemSize = 32 :: Int
-
 initSprockellState :: Value -> SprockellState
 initSprockellState sprID = SprState
         { pc       = 0
@@ -45,9 +43,6 @@ sprTest sprID instrs input = putStr
 -- ====================================================================================================
 -- System Test
 -- ====================================================================================================
-data Tick  = Tick        deriving (Eq,Show)
-type Clock = [Tick]
-clock = repeat Tick
 
 systemSim :: Debugger st -> [InstructionMem] -> SystemState -> Clock -> IO ()
 systemSim (dbg,dbgSt) instrss s []     = return ()
@@ -63,9 +58,6 @@ systemSim (dbg,dbgSt) instrss s (t:ts) | sysHalted = return ()
                   && (and $ map and $ map (map (==NoRequest)) $ requestChnls s)
                   && (and $ map (\(_,r) -> r == NoRequest) $ requestFifo s)
 
-
-shMemSize       = 8 :: Int
-channelDelay    = 4 :: Int
 
 initSystemState nrOfSprockells = SystemState
         { sprStates     = map initSprockellState [0 .. nrOfSprockells-1]
