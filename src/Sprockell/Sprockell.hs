@@ -13,6 +13,7 @@ import Sprockell.HardwareTypes
 | Initial definition: October 2012, Jan Kuper (j.kuper@utwente.nl)
 | Extensions: June 2015, Martijn Bastiaan, Arjan Boeijink, Jan Kuper, Leon Schoorl
 | Simplification: January 2016, Jan Kuper
+| Further extensions: June 2017, Leon Schoorl
 -------------------------------------------------------------}
 
 -- =====================================================================================

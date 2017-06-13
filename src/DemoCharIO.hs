@@ -24,7 +24,7 @@ prog =
     , Branch regC (Abs 48)              -- then jump to "inputDone"
     , Store regA (IndAddr regB)         -- else store character in local memory
     , Compute Incr regB regB regB
-    , Jump (Abs 39)                     -- "beginInputLoop"
+    , Jump (Abs 39)                     -- target "beginInputLoop"
     ]
     -- "inputDone": 48
     ++ writeString "Hello "
