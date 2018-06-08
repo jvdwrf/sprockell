@@ -7,8 +7,10 @@ import Sprockell.Sprockell
 import Sprockell.System
 import Sprockell.Debugger
 
-import System.IO         (BufferMode(..),stdin,stdout,hGetBuffering,hSetBuffering)
+import System.IO         (BufferMode(..),Handle,stdin,stdout,stderr,hGetBuffering,hSetBuffering,hPutStrLn,IOMode(..),hClose)
 import Control.Exception (bracket)
+
+import Network.Socket
 
 -- ====================================================================================================
 -- Sprockell Test
@@ -44,7 +46,7 @@ sprTest sprID instrs input = putStr
 -- System Test
 -- ====================================================================================================
 
-systemSim :: Debugger st -> [InstructionMem] -> SystemState -> Clock -> IO ()
+systemSim :: DebuggerPair st -> [InstructionMem] -> SystemState -> Clock -> IO ()
 systemSim (dbg,dbgSt) instrss s []     = return ()
 systemSim (dbg,dbgSt) instrss s (t:ts) | sysHalted = return ()
                                        | otherwise = do
@@ -74,10 +76,50 @@ runWithDebugger :: Debugger st -> [[Instruction]] -> IO ()       -- debugger + l
 runWithDebugger dbg instrss = do
     bracket setupBuffering
             restoreBuffering
-            (\_ -> systemSim dbg instrss' (initSystemState nrOfSprockells) clock)
+            (\_ -> systemSim dbgPair instrss' (initSystemState nrOfSprockells) clock)
     return ()
     where nrOfSprockells = length instrss
           instrss' = map fromList instrss  -- conversion to Memory
+          dbgPair = dbg (stdin,stdout)
+
+
+
+runWithDebuggerOverNetwork :: Debugger st -> [[Instruction]] -> IO ()       -- debugger + list of programs per Sprockell
+runWithDebuggerOverNetwork dbg instrss = do
+    bracket setupBuffering
+            restoreBuffering
+            (\_ -> bracket  listenForFirstConnect
+                            (\(h,_) -> hPutStrLn stderr "Closing connection" >> hClose h)
+                            (\(h,addr) -> do
+                                hPutStrLn stderr $ "Accepted connection from " ++ show addr ++", starting Sprockell program...\n"
+                                let dbgPair = dbg (h,h)
+                                systemSim dbgPair instrss' (initSystemState nrOfSprockells) clock
+                            )
+            )
+    return ()
+    where nrOfSprockells = length instrss
+          instrss' = map fromList instrss  -- conversion to Memory
+
+
+listenForFirstConnect :: IO (Handle, SockAddr)
+listenForFirstConnect = withSocketsDo $ do
+    addrinfos <- getAddrInfo
+                    (Just (defaultHints {addrFlags = [AI_PASSIVE], addrSocketType = Stream}))
+                    (Just "127.0.0.1")
+                    Nothing -- pick any free port
+    let serveraddr = head addrinfos
+    sock <- socket (addrFamily serveraddr) Stream defaultProtocol
+    bind sock (addrAddress serveraddr)
+
+    listen sock 1
+    port <- socketPort sock
+    hPutStrLn stderr $ "Now listening on port " ++ show port
+    hPutStrLn stderr "To start the Sprockells, connect to the debugger using the command:\n"
+    hPutStrLn stderr $ "\ttelnet 127.0.0.1 " ++ show port ++"\n\n"
+    (clSock,clAddr) <- accept sock
+    clHandle <- socketToHandle clSock ReadWriteMode
+    close sock -- close listening socket, not accepting any more incoming connections
+    return (clHandle,clAddr)
 
 setupBuffering :: IO (BufferMode,BufferMode)
 setupBuffering = do
