@@ -35,6 +35,10 @@ git clone https://github.com/leonschoorl/sprockell.git
 cd sprockell
 
 # ask cabal to install the package from the current directory
+# using cabal >=2.4
+cabal v1-install
+
+# or using cabal <2.4
 cabal install
 ```
 
