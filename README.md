@@ -33,13 +33,16 @@ Installing can be done using the following commands:
 
 ```shell
 # clone the repository (if you haven't done so already)
-git clone https://github.com/leonschoorl/sprockell.git
+$ git clone https://github.com/leonschoorl/sprockell.git
 
 # go into the directory
-cd sprockell
+$ cd sprockell
 
 # install library & executables
-stack install
+$ stack install
+
+# generate mandelbrot
+$ stack run mandelbrot
 ```
 
 When you decide to make changes to the Sprockell system don't forget to reinstall it.
