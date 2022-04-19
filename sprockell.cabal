@@ -1,30 +1,104 @@
-name:                sprockell
-version:             2018.0.0
--- synopsis:
--- description:
-homepage:            https://github.com/leonschoorl/sprockell
-license:             MIT
-license-file:        LICENSE
-author:              Jan Kuper, Martijn Bastiaan, Arjan Boeijink, Leon Schoorl
--- copyright:
--- category:
-build-type:          Simple
-extra-source-files:  README.md
-cabal-version:       >=1.10
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.34.5.
+--
+-- see: https://github.com/sol/hpack
+
+name:           sprockell
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/bobismijnnaam/sprockell#readme>
+homepage:       https://github.com/bobismijnnaam/sprockell#readme
+bug-reports:    https://github.com/bobismijnnaam/sprockell/issues
+author:         PP Team, University of Twente
+maintainer:     bobrubbens@gmail.com
+copyright:      2022 PP Team, University of Twente
+license:        MIT
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/bobismijnnaam/sprockell
 
 library
-  exposed-modules:   Sprockell
-                     Sprockell.BasicFunctions
-                     Sprockell.HardwareTypes
-                     Sprockell.Sprockell
-                     Sprockell.System
-                     Sprockell.Debugger
-                     Sprockell.Simulation
-  -- other-modules:
-  build-depends:       base       >=4.8 && <5,
-                       array      >=0.5 && <0.6,
-                       containers >=0.5 && <0.6,
-                       deepseq    >=1.4 && <1.5,
-                       network    >=2.6 && <3.2
-  hs-source-dirs:      src
-  default-language:    Haskell2010
+  exposed-modules:
+      Sprockell
+      Sprockell.BasicFunctions
+      Sprockell.Debugger
+      Sprockell.HardwareTypes
+      Sprockell.Simulation
+      Sprockell.Sprockell
+      Sprockell.System
+  other-modules:
+      Paths_sprockell
+  hs-source-dirs:
+      src
+  build-depends:
+      array ==0.5.*
+    , base >=4.7 && <5
+    , containers >=0.5
+    , deepseq ==1.4.*
+    , network >=2.6 && <3.2
+  default-language: Haskell2010
+
+executable char-io
+  main-is: DemoCharIO.hs
+  other-modules:
+      Paths_sprockell
+  hs-source-dirs:
+      demos/char-io
+  build-depends:
+      array ==0.5.*
+    , base >=4.7 && <5
+    , containers >=0.5
+    , deepseq ==1.4.*
+    , network >=2.6 && <3.2
+    , sprockell
+  default-language: Haskell2010
+
+executable fib
+  main-is: DemoFib.hs
+  other-modules:
+      Paths_sprockell
+  hs-source-dirs:
+      demos/fib
+  build-depends:
+      array ==0.5.*
+    , base >=4.7 && <5
+    , containers >=0.5
+    , deepseq ==1.4.*
+    , network >=2.6 && <3.2
+    , sprockell
+  default-language: Haskell2010
+
+executable mandelbrot
+  main-is: DemoMandelbrot.hs
+  other-modules:
+      Paths_sprockell
+  hs-source-dirs:
+      demos/mandelbrot
+  build-depends:
+      array ==0.5.*
+    , base >=4.7 && <5
+    , containers >=0.5
+    , deepseq ==1.4.*
+    , network >=2.6 && <3.2
+    , sprockell
+  default-language: Haskell2010
+
+executable multiple-sprockells
+  main-is: DemoMultipleSprockells.hs
+  other-modules:
+      Paths_sprockell
+  hs-source-dirs:
+      demos/multiple-sprockells
+  build-depends:
+      array ==0.5.*
+    , base >=4.7 && <5
+    , containers >=0.5
+    , deepseq ==1.4.*
+    , network >=2.6 && <3.2
+    , sprockell
+  default-language: Haskell2010

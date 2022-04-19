@@ -1,6 +1,7 @@
+module Main where
+
 import Sprockell
 import Data.Char
-
 
 {-|
     This program demonstrates the character IO system.
