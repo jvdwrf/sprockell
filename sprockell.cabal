@@ -5,13 +5,13 @@ cabal-version: 1.12
 -- see: https://github.com/sol/hpack
 
 name:           sprockell
-version:        0.1.0.0
+version:        2022.0.0
 description:    Please see the README on GitHub at <https://github.com/bobismijnnaam/sprockell#readme>
 homepage:       https://github.com/bobismijnnaam/sprockell#readme
 bug-reports:    https://github.com/bobismijnnaam/sprockell/issues
-author:         PP Team, University of Twente
+author:         Jan Kuper, Martijn Bastiaan, Arjan Boeijink, Leon Schoorl, Bob Rubbens
 maintainer:     bobrubbens@gmail.com
-copyright:      2022 PP Team, University of Twente
+copyright:      2022, University of Twente
 license:        MIT
 license-file:   LICENSE
 build-type:     Simple
