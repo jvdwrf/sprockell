@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.5.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 
@@ -41,64 +41,4 @@ library
     , containers >=0.5
     , deepseq ==1.4.*
     , network >=2.6 && <3.2
-  default-language: Haskell2010
-
-executable char-io
-  main-is: DemoCharIO.hs
-  other-modules:
-      Paths_sprockell
-  hs-source-dirs:
-      demos/char-io
-  build-depends:
-      array ==0.5.*
-    , base >=4.7 && <5
-    , containers >=0.5
-    , deepseq ==1.4.*
-    , network >=2.6 && <3.2
-    , sprockell
-  default-language: Haskell2010
-
-executable fib
-  main-is: DemoFib.hs
-  other-modules:
-      Paths_sprockell
-  hs-source-dirs:
-      demos/fib
-  build-depends:
-      array ==0.5.*
-    , base >=4.7 && <5
-    , containers >=0.5
-    , deepseq ==1.4.*
-    , network >=2.6 && <3.2
-    , sprockell
-  default-language: Haskell2010
-
-executable mandelbrot
-  main-is: DemoMandelbrot.hs
-  other-modules:
-      Paths_sprockell
-  hs-source-dirs:
-      demos/mandelbrot
-  build-depends:
-      array ==0.5.*
-    , base >=4.7 && <5
-    , containers >=0.5
-    , deepseq ==1.4.*
-    , network >=2.6 && <3.2
-    , sprockell
-  default-language: Haskell2010
-
-executable multiple-sprockells
-  main-is: DemoMultipleSprockells.hs
-  other-modules:
-      Paths_sprockell
-  hs-source-dirs:
-      demos/multiple-sprockells
-  build-depends:
-      array ==0.5.*
-    , base >=4.7 && <5
-    , containers >=0.5
-    , deepseq ==1.4.*
-    , network >=2.6 && <3.2
-    , sprockell
   default-language: Haskell2010

@@ -9,13 +9,6 @@ copyright:           "2022, University of Twente"
 extra-source-files:
 - README.md
 
-# Metadata used when publishing your package
-# synopsis:            Short description of your package
-# category:            Web
-
-# To avoid duplicated efforts in documentation and dealing with the
-# complications of embedding Haddock markup inside cabal files, it is
-# common to point users to the README.md file.
 description:         Please see the README on GitHub at <https://github.com/bobismijnnaam/sprockell#readme>
 
 dependencies:
@@ -28,25 +21,3 @@ dependencies:
 library:
   source-dirs: src
 
-executables:
-  char-io:
-    main: DemoCharIO.hs
-    source-dirs: demos/char-io
-    dependencies:
-    - sprockell
-  fib:
-    main: DemoFib.hs
-    source-dirs: demos/fib
-    dependencies:
-    - sprockell
-  mandelbrot:
-    main: DemoMandelbrot.hs
-    source-dirs: demos/mandelbrot
-    dependencies:
-    - sprockell
-  multiple-sprockells:
-    main: DemoMultipleSprockells.hs
-    source-dirs: demos/multiple-sprockells
-    dependencies:
-    - sprockell
-    
