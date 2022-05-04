@@ -21,33 +21,48 @@ There are a number of demo programs showing various features.
 * [DemoMultipleSprockells.hs]
  shows communication between multiple Sprockell cores using the shared memory
 
-## Installing
+## Using sprockell
 
-(Warning: untested)
+You can use this Sprockell package in several ways:
 
-You can install the Sprockell system as a Haskell package.
-That way you can separate your (generated) code from the code of the Sprockell system.
-Also the system gets compiled to native machine code, and runs a lot faster. (To see the difference, try running DemoMandelbrot in and outside of the repository.)
+1. Run a haskell file that uses sprockell directly
+2. Compile a haskell file that uses sprockell, and then run the compiled Sprockell program
+3. Add a binary to the Sprockell package, and instruct Stack to run that
+4. Create a separate Stack project for your Haskell file, which depends on this Sprockell package
 
-Installing can be done using the following commands: 
+### Run directly
 
-```shell
-# clone the repository (if you haven't done so already)
-$ git clone https://github.com/leonschoorl/sprockell.git
-
-# go into the directory
-$ cd sprockell
-
-# install library & executables
-$ stack install
-
-# generate mandelbrot
-$ stack run mandelbrot
+```bash
+# Ensure sprockell libs are built
+$ stack build
+...
+$ stack runhaskell demos/DemoMandelbrot.hs
+...mandelbrot...
 ```
 
-When you decide to make changes to the Sprockell system don't forget to reinstall it.
+### Compile a haskell file
+
+```bash
+# Ensure sprockell libs are built
+$ stack build
+...
+$ stack ghc demos/DemoMandelbrot.hs
+[1 of 1] Compiling Main             ( demos/DemoMandelbrot.hs, demos/DemoMandelbrot.o )
+Linking demos/DemoMandelbrot ...
+$ ./demos/DemoMandelbrot
+...mandelbrot...
+```
+
+### Add a binary
+
+See the [Stack documentation] for instructions on how to add executables to projects. You can also generate an example/template project using Stack, and then see how it's done there.
+
+### Create a separate stack project
+
+You could automatically generate a Stack project, containing your output Haskell/Sprockell file, which depends via a git url on this Sprockell package. We again refer you to the [Stack documentation].
 
 [HardwareTypes.hs]: src/Sprockell/HardwareTypes.hs#L115
 [DemoFib.hs]: demos/fib/DemoFib.hs
 [DemoCharIO.hs]: demos/char-io/DemoCharIO.hs
 [DemoMultipleSprockells.hs]: demos/multiple-sprockells/DemoMultipleSprockells.hs
+[Stack documentation]: https://docs.haskellstack.org/en/stable/README/
