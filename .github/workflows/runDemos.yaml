@@ -8,7 +8,7 @@ jobs:
             - uses: haskell/actions/setup@v2
               with:
                 enable-stack: true 
-            - run: start runDemos.bat
+            - run: runDemos.bat
     nix:
         runs-on: ubuntu-latest
         steps:
