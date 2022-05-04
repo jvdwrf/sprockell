@@ -26,4 +26,5 @@ prog = [
          , EndProg
        ]
 
-main = runWithDebugger (debuggerSimplePrintAndWait myShow) [prog,prog,prog,prog]
+-- If you want to inspect the output, use debuggerSimplePrintAndWait
+main = runWithDebugger (debuggerSimplePrint myShow) [prog,prog,prog,prog]

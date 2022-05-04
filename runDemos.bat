@@ -8,4 +8,4 @@ echo "Alice" | stack runhaskell demos/DemoCharIO.hs
 
 stack runhaskell demos/DemoMandelbrot.hs
 
-echo "`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n" | stack runhaskell demos/DemoMultipleSprockells.hs
+stack runhaskell demos/DemoMultipleSprockells.hs

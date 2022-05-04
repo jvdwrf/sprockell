@@ -10,4 +10,4 @@ echo "Alice" | stack runhaskell demos/DemoCharIO.hs
 
 stack runhaskell demos/DemoMandelbrot.hs
 
-yes "\n" | stack runhaskell demos/DemoMultipleSprockells.hs
+stack runhaskell demos/DemoMultipleSprockells.hs
