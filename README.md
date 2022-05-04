@@ -30,6 +30,8 @@ You can use this Sprockell package in several ways:
 3. Add a binary to the Sprockell package, and instruct Stack to run that
 4. Create a separate Stack project for your Haskell file, which depends on this Sprockell package
 
+You can also find some practical usage of this in the [continuous integration](./runDemos.sh).
+
 ### Run directly
 
 ```bash
