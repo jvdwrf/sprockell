@@ -9,7 +9,7 @@ jobs:
               with:
                 enable-stack: true 
             - run: dir
-            - run: runDemos.bat
+            - run: .\runDemos.bat
     nix:
         runs-on: ubuntu-latest
         steps:
