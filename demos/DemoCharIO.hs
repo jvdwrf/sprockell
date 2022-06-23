@@ -81,5 +81,3 @@ doesLocalMemWrite (instrs,st) = any isStoreInstr instrs
         isStoreInstr (Store _ _) = True
         isStoreInstr _           = False
 
--- main_3: like main_2, but opens an TCP port and lets you talk to the debugger over that
-main_3 = runWithDebuggerOverNetwork (debuggerPrintCondWaitCond showLocalMem doesLocalMemWrite never) [prog]
